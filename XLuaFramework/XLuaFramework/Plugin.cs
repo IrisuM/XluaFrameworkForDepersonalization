@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using XLua;
+using XLuaFramework.LuaTool;
 using static XLuaFramework.PluginConst;
 
 namespace XLuaFramework
@@ -34,11 +35,11 @@ namespace XLuaFramework
             is_enable_console_config = Config.Bind(PluginConfig.CONFIG_SECTION, PluginConfig.CONFIG_IS_ENABLE_CONSOLE, false, new ConfigDescription(PluginConfig.CONFIG_IS_ENABLE_CONSOLE_DESCRIPTION));
 
             Harmony harmony = new Harmony(PluginConfig.PLUGIN_GUID);
-            harmony.PatchAll(typeof(HookInterface.RoleModel_Patch));
+            harmony.PatchAll(typeof(HookInterface.UnityEngine_Resources_Patch));
 
             Log.LogMessage("开始加载XluaMod");
             //逐个加载lua mod
-            foreach (string path in XluaHelper.GetModDir())
+            foreach (string path in XluaModManager.GetModDir())
             {
                 Log.LogMessage("加载:" + path);
                 try

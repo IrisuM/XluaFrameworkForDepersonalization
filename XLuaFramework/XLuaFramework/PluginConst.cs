@@ -35,7 +35,7 @@ namespace XLuaFramework
 
         public static class PluginXluaCallbackConfig
         {
-            public const string OnRoleModelInstall = "OnRoleModelInstall";
+            public const string OnResourceLoad = "OnResourceLoad";
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BepInEx.Workshop;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,10 +15,16 @@ using static XLuaFramework.PluginConst;
 
 namespace XLuaFramework
 {
-    public class XluaMod : LuaEnv
+    public struct LuaCallback
+    {
+        public LuaFunction OnResourceLoad = null;
+        public LuaCallback() { }
+    }
+    public class XluaMod
     {
         string modRoot = "";
-        public LuaFunction OnRoleModelInstall = null;
+        public LuaEnv luaEnv;
+        public LuaCallback callback;
         private byte[] FixLoadPath(ref string filepath)
         {
             string path = Path.Combine(modRoot, filepath + ".lua");
@@ -27,23 +34,23 @@ namespace XLuaFramework
             }
             return null;
         }
-        public XluaMod(string root)
+        public XluaMod(string root, LuaEnv luaEnv)
         {
             try
             {
                 modRoot = root;
                 CustomLoader loader = FixLoadPath;
-                AddLoader(loader);
+                luaEnv.AddLoader(loader);
                 string main_path = Path.Combine(modRoot, PluginPathConfig.XluaModMain + ".lua");
                 if (File.Exists(main_path))
                 {
-                    DoString(string.Format("require '{0}'", PluginPathConfig.XluaModMain));
+                    luaEnv.DoString(string.Format("require '{0}'", PluginPathConfig.XluaModMain));
                 }
                 else
                 {
                     Plugin.Log.LogMessage("未发现主lua文件:" + main_path);
                 }
-                OnRoleModelInstall = Global.Get<LuaFunction>(PluginXluaCallbackConfig.OnRoleModelInstall);
+                callback.OnResourceLoad = luaEnv.Global.Get<LuaFunction>(PluginXluaCallbackConfig.OnResourceLoad);
             }
             catch (Exception e)
             {
@@ -54,33 +61,52 @@ namespace XLuaFramework
                     Plugin.Log.LogError(e.Message);
                 }
             }
-            
+
+            this.luaEnv = luaEnv;
         }
-        public XluaMod() : this(XluaHelper.GetLocalDir()) { }
+        public XluaMod(LuaEnv luaEnv) : this(XluaModManager.GetLocalDir(),luaEnv) { }
+        public XluaMod(string path) : this(path, new LuaEnv()) { }
+        public XluaMod() : this(XluaModManager.GetLocalDir()) { }
     }
     public static class XluaModManager
     {
-        static XluaMod gluaEnv = new XluaMod();
+        static LuaEnv gluaEnv = new LuaEnv();
         static Dictionary<string, XluaMod> luaenvs = new Dictionary<string, XluaMod>();
         public static Dictionary<string, XluaMod> lua_envs { get { return luaenvs; } }
         static XluaModManager()
         {
-            lua_envs["local"] = gluaEnv;
+            luaenvs["local"]= new XluaMod(gluaEnv);
         }
+        //创建MOD对象
         public static XluaMod CreateXluaMod(string env_name, string root_path)
         {
-            if (!Plugin.s_Instance.is_merge_luaenv)
+            if (!luaenvs.ContainsKey(env_name))
             {
-                if (!luaenvs.ContainsKey(env_name))
+                if (!Plugin.s_Instance.is_merge_luaenv)
                 {
                     luaenvs[env_name] = new XluaMod(root_path);
                 }
-                return luaenvs[env_name];
+                else
+                {
+                    luaenvs[env_name] = new XluaMod(root_path, gluaEnv);
+                }
             }
-            else
+            return luaenvs[env_name];
+        }
+        //获取本地MOD路径
+        public static string GetLocalDir()
+        {
+            return Path.Combine(Application.streamingAssetsPath, PluginPathConfig.FrameworkPath);
+        }
+        //获取MOD路径
+        public static string[] GetModDir()
+        {
+            List<string> mods = new List<string>();
+            foreach (ModInfo info in WorkshopLoader.Inst.ModMag.ModList)
             {
-                return gluaEnv;
+                mods.Add(Path.Combine(info.ModDir, PluginPathConfig.FrameworkPath));
             }
+            return mods.ToArray();
         }
     }
 }
