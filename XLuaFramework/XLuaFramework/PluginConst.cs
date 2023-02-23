@@ -29,7 +29,7 @@ namespace XLuaFramework
         
         public static class PluginPathConfig
         {
-            public const string FrameworkPath = "XluaMod";
+            public const string FrameworkPath = "plugins/XluaMod";
             public const string XluaModMain = "main";
         }
 
