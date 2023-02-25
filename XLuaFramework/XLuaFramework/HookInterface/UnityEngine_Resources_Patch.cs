@@ -15,26 +15,32 @@ namespace XLuaFramework.HookInterface
         [HarmonyPatch(typeof(Resources), "Load", new Type[] { typeof(string), typeof(Type) })]
         static void UnityEngine_Resources_Load_Postfix(ref Object __result, string path, Type systemTypeInstance)
         {
-            foreach (var mod in XluaModManager.lua_envs)
+            try
             {
-                if (mod.Value.callback.OnResourceLoad != null)
+                XluaCallback.RunCallback(PluginConst.PluginXluaCallbackConfig.OnResourceLoad, new object[] { __result, path, systemTypeInstance.Name });
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError(e.Message);
+                while (e.InnerException != null)
                 {
-                    try
-                    {
-                        __result = mod.Value.callback.OnResourceLoad.Call(__result, path, systemTypeInstance.Name).First() as Object;
-                    }
-                    catch (Exception e)
-                    {
-                        Plugin.Log.LogError(e.Message);
-                        while (e.InnerException != null)
-                        {
-                            e = e.InnerException;
-                            Plugin.Log.LogError(e.Message);
-                        }
-                    }
+                    e = e.InnerException;
+                    Plugin.Log.LogError(e.Message);
                 }
             }
+        }
 
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Resources), "Load", new Type[] { typeof(string), typeof(Type) })]
+        static bool UnityEngine_Resources_Load_Prefix(ref Object __result, string path)
+        {
+            Object result = LuaTool.ResourcesTool.GetPoolObject(path);
+            if (result != null)
+            {
+                __result = result;
+                return false;
+            }
+            return true;
         }
     }
 }

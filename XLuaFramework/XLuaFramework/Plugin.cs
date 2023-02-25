@@ -16,8 +16,8 @@ namespace XLuaFramework
     [BepInPlugin(PluginConfig.PLUGIN_GUID, PluginConfig.PLUGIN_NAME, PluginConfig.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
-        internal static ManualLogSource Log;
-        internal static Plugin s_Instance;
+        public static ManualLogSource Log;
+        public static Plugin s_Instance;
 
         private ConfigEntry<bool> is_merge_luaenv_config;
         private ConfigEntry<bool> is_enable_console_config;
@@ -36,26 +36,7 @@ namespace XLuaFramework
 
             Harmony harmony = new Harmony(PluginConfig.PLUGIN_GUID);
             harmony.PatchAll(typeof(HookInterface.UnityEngine_Resources_Patch));
-
-            Log.LogMessage("开始加载XluaMod");
-            //逐个加载lua mod
-            foreach (string path in XluaModManager.GetModDir())
-            {
-                Log.LogMessage("加载:" + path);
-                try
-                {
-                    XluaModManager.CreateXluaMod(path, path);
-                }
-                catch (Exception e)
-                {
-                    Log.LogError(e.Message);
-                    while (e.InnerException != null)
-                    {
-                        e = e.InnerException;
-                        Log.LogError(e.Message);
-                    }
-                }
-            }
+            harmony.PatchAll(typeof(HookInterface.ResManager_Patch));
         }
     }
 }

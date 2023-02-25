@@ -5,19 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace XLuaFramework.LuaTool
 {
     internal static class ResourcesTool
     {
-        public static Texture2D LoadTexture2D(string path)
+        static Dictionary<string, Object> ResPool = new Dictionary<string, Object>();
+        public static Object GetPoolObject(string path)
         {
-            return Resources.Load<Texture2D>(path);
+            Object result = null;
+            result = ResPool.TryGetValue(path, out result) ? result : null;
+            return result;
         }
-        public static Sprite LoadSprite(string path, Rect rect, Vector2 pivot, float pixelsPerUnit)
+        public static void AddPoolObject(string path,Object res)
         {
-            Texture2D texture = LoadTexture2D(path);
-            return Sprite.Create(texture, rect, pivot, pixelsPerUnit);
+            ResPool[path] = res;
         }
     }
 }

@@ -35,7 +35,13 @@ namespace XLuaFramework
 
         public static class PluginXluaCallbackConfig
         {
+            public const string XluaComponentName = "XluaModManager";
             public const string OnResourceLoad = "OnResourceLoad";
+            public const string OnResManagerInstall = "OnResManagerInstall";
+            public const string OnUpdate = "OnUpdate";
+            public const string OnLateUpdate = "OnLateUpdate";
+            public const string OnFixedUpdate = "OnFixedUpdate";
+            public const string OnOnGUI = "OnOnGUI";
         }
     }
 }

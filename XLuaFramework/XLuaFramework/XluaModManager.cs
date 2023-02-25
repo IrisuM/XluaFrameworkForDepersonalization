@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -15,16 +16,10 @@ using static XLuaFramework.PluginConst;
 
 namespace XLuaFramework
 {
-    public struct LuaCallback
-    {
-        public LuaFunction OnResourceLoad = null;
-        public LuaCallback() { }
-    }
     public class XluaMod
     {
         string modRoot = "";
         public LuaEnv luaEnv;
-        public LuaCallback callback;
         private byte[] FixLoadPath(ref string filepath)
         {
             string path = Path.Combine(modRoot, filepath + ".lua");
@@ -50,7 +45,6 @@ namespace XLuaFramework
                 {
                     Plugin.Log.LogMessage("未发现主lua文件:" + main_path);
                 }
-                callback.OnResourceLoad = luaEnv.Global.Get<LuaFunction>(PluginXluaCallbackConfig.OnResourceLoad);
             }
             catch (Exception e)
             {
@@ -64,23 +58,25 @@ namespace XLuaFramework
 
             this.luaEnv = luaEnv;
         }
-        public XluaMod(LuaEnv luaEnv) : this(XluaModManager.GetLocalDir(),luaEnv) { }
+        public XluaMod(LuaEnv luaEnv) : this(XluaModManager.GetLocalDir(), luaEnv) { }
         public XluaMod(string path) : this(path, new LuaEnv()) { }
         public XluaMod() : this(XluaModManager.GetLocalDir()) { }
     }
     public static class XluaModManager
     {
+        public static bool isInit { get; private set; } = false;
         static LuaEnv gluaEnv = new LuaEnv();
         static Dictionary<string, XluaMod> luaenvs = new Dictionary<string, XluaMod>();
         public static Dictionary<string, XluaMod> lua_envs { get { return luaenvs; } }
         static XluaModManager()
         {
-            luaenvs["local"]= new XluaMod(gluaEnv);
+            luaenvs["local"] = new XluaMod(gluaEnv);
         }
         //创建MOD对象
         public static XluaMod CreateXluaMod(string env_name, string root_path)
         {
-            if (!luaenvs.ContainsKey(env_name))
+            XluaMod mod = null;
+            if (!luaenvs.TryGetValue(env_name, out mod) || mod == null)
             {
                 if (!Plugin.s_Instance.is_merge_luaenv)
                 {
@@ -91,7 +87,8 @@ namespace XLuaFramework
                     luaenvs[env_name] = new XluaMod(root_path, gluaEnv);
                 }
             }
-            return luaenvs[env_name];
+            isInit = true;
+            return mod;
         }
         //获取本地MOD路径
         public static string GetLocalDir()
@@ -107,6 +104,66 @@ namespace XLuaFramework
                 mods.Add(Path.Combine(info.ModDir, PluginPathConfig.FrameworkPath));
             }
             return mods.ToArray();
+        }
+    }
+    public class XluaModComponent : MonoBehaviour
+    {
+        public static void CreateXluaModComponent()
+        {
+            GameObject XluaModManagerObj = new GameObject(PluginXluaCallbackConfig.XluaComponentName);
+            XluaModManagerObj.AddComponent<XluaModComponent>();
+            if (!XluaModManager.isInit)
+            {
+                Plugin.Log.LogMessage("开始加载XluaMod");
+                //逐个加载lua mod
+                foreach (string path in XluaModManager.GetModDir())
+                {
+                    Plugin.Log.LogMessage("加载:" + path);
+                    try
+                    {
+                        XluaModManager.CreateXluaMod(path, path);
+                    }
+                    catch (Exception e)
+                    {
+                        Plugin.Log.LogError(e.Message);
+                        while (e.InnerException != null)
+                        {
+                            e = e.InnerException;
+                            Plugin.Log.LogError(e.Message);
+                        }
+                    }
+                }
+            }
+        }
+        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        void FixedUpdate()
+        {
+            XluaCallback.RunCallback(PluginXluaCallbackConfig.OnFixedUpdate, new object[] { });
+        }
+        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        void Update()
+        {
+            foreach(var e in XluaModManager.lua_envs)
+            {
+                e.Value.luaEnv.Tick();
+            }
+
+            XluaCallback.RunCallback(PluginXluaCallbackConfig.OnUpdate, new object[] { });
+        }
+        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        void LateUpdate()
+        {
+            XluaCallback.RunCallback(PluginXluaCallbackConfig.OnLateUpdate, new object[] { });
+        }
+        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        void OnGUI()
+        {
+            XluaCallback.RunCallback(PluginXluaCallbackConfig.OnOnGUI, new object[] { });
         }
     }
 }
