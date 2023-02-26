@@ -57,7 +57,7 @@ function RoleModelTool:SetAnimation(role_model, new_animation)
     end
 end
 
---返回头像数据
+--返回头像数据，Type为差分值：0-4
 function RoleModelTool:GetHeadIcons(role_model)
     local result = {}
     for k, v in pairs(role_model.HeadIcons) do
@@ -69,7 +69,7 @@ function RoleModelTool:GetHeadIcons(role_model)
     return result
 end
 
---设置头像数据
+--设置头像数据，Type为差分值：0-4
 function RoleModelTool:SetHeadIcons(role_model, new_headicons)
     role_model.HeadIcons:Clear()
     for key, value in ipairs(new_headicons) do
@@ -81,7 +81,7 @@ function RoleModelTool:SetHeadIcons(role_model, new_headicons)
     return result
 end
 
---加载适用于人物动画的图片格式
+--加载适用于人物动画的图片格式，通常为48*64，如果图片大小不符合，可以自己调用ResourcesTool接口大家在指定大小
 function RoleModelTool:LoadSpriteForRoleModel(path)
     return ResourcesTool:LoadSprite(path, CS.UnityEngine.Rect(0, 0, 48.0, 64.0), { x = 0.5, y = 0 }, 64)
 end

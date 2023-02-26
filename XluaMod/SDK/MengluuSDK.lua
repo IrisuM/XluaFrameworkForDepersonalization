@@ -1,12 +1,14 @@
 --[[
 这是一个简易工具类，会加入一些常用函数的封装
 --]]
-
 Mengluu = Mengluu or {}
 
 --打印日志
 function Mengluu:Print(s)
-    if s.ToString ~= null then
+    if s == nil then
+        s = "nil"
+    end
+    if s.ToString ~= nil then
         s = s:ToString()
     end
     CS.XLuaFramework.Plugin.Log:LogMessage("MengluuLua: " .. s)
@@ -24,7 +26,7 @@ function Mengluu:PrintTable(data, numBlank)
         end
         for k, v in pairs(data) do
             if type(v) == "table" then
-                self:Print(blank ..k.. "数据类型:" .. type(v))
+                self:Print(blank .. k .. "数据类型:" .. type(v))
                 self:PrintTable(v, numBlank + 1)
             else
                 local vaule = v
