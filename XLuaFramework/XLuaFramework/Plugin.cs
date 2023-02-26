@@ -18,6 +18,7 @@ namespace XLuaFramework
     {
         public static ManualLogSource Log;
         public static Plugin s_Instance;
+        public static Harmony harmony;
 
         private ConfigEntry<bool> is_merge_luaenv_config;
         private ConfigEntry<bool> is_enable_console_config;
@@ -34,7 +35,7 @@ namespace XLuaFramework
             is_merge_luaenv_config = Config.Bind(PluginConfig.CONFIG_SECTION, PluginConfig.CONFIG_IS_MERGE_LUAENV, false, new ConfigDescription(PluginConfig.CONFIG_IS_MERGE_LUAENV_DESCRIPTION));
             is_enable_console_config = Config.Bind(PluginConfig.CONFIG_SECTION, PluginConfig.CONFIG_IS_ENABLE_CONSOLE, false, new ConfigDescription(PluginConfig.CONFIG_IS_ENABLE_CONSOLE_DESCRIPTION));
 
-            Harmony harmony = new Harmony(PluginConfig.PLUGIN_GUID);
+            harmony = new Harmony(PluginConfig.PLUGIN_GUID);
             harmony.PatchAll(typeof(HookInterface.UnityEngine_Resources_Patch));
             harmony.PatchAll(typeof(HookInterface.ResManager_Patch));
         }

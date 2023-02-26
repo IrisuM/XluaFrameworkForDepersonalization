@@ -20,6 +20,7 @@ namespace XLuaFramework.LuaTool
         }
         public static void AddPoolObject(string path,Object res)
         {
+            Object.DontDestroyOnLoad(res);
             ResPool[path] = res;
         }
     }
