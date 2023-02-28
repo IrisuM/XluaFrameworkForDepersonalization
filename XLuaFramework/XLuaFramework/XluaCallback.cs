@@ -30,7 +30,7 @@ namespace XLuaFramework
         {
             if (!callbacks.ContainsKey(key))
             {
-                callbacks[key] = new LuaCallback() { func = luaFunction.Call,description=description };
+                callbacks[key] = new LuaCallback() { func = luaFunction.Call, description = description };
             }
             else
             {
@@ -54,9 +54,14 @@ namespace XLuaFramework
             {
                 return false;
             }
-            if(!reg_events.ContainsKey(methodInfo.FullDescription()))
+            if (callbacks.ContainsKey(event_name))
             {
-                reg_events[methodInfo.FullDescription()] =new List<string>();
+                Plugin.Log.LogError("事件名称重复");
+                return false;
+            }
+            if (!reg_events.ContainsKey(methodInfo.FullDescription()))
+            {
+                reg_events[methodInfo.FullDescription()] = new List<string>();
             }
             reg_events[methodInfo.FullDescription()].Add(event_name);
             Plugin.Log.LogMessage(string.Format("注册事件:{0} {1} {2}", methodInfo.FullDescription(), event_name, is_before));
@@ -70,9 +75,9 @@ namespace XLuaFramework
             }
             return true;
         }
-        public static bool RegEvent(string type_name, string method_name,string event_name, bool is_before)
+        public static bool RegEvent(string type_name, string method_name, string event_name, bool is_before)
         {
-            Type type = Type.GetType(type_name); 
+            Type type = Type.GetType(type_name);
             if (type == null)
             {
                 Plugin.Log.LogError("未发现类型:" + type_name);
@@ -95,7 +100,7 @@ namespace XLuaFramework
                 return false;
             }
             List<Type> args_type_list = new List<Type>();
-            foreach(string arg_type_name in args_type)
+            foreach (string arg_type_name in args_type)
             {
                 Type arg_type = Type.GetType(arg_type_name);
                 if (arg_type == null)
@@ -116,15 +121,15 @@ namespace XLuaFramework
         public static void Xlua_Callback_Prefix(object __instance, MethodBase __originalMethod)
         {
             List<string> events;
-            if(reg_events.TryGetValue(__originalMethod.FullDescription(),out events))
+            if (reg_events.TryGetValue(__originalMethod.FullDescription(), out events))
             {
-                foreach(string e in events)
+                foreach (string e in events)
                 {
                     RunCallback(e, new object[] { __instance });
                 }
             }
         }
-        public static void Xlua_Callback_Postfix(object __instance,  MethodBase __originalMethod)
+        public static void Xlua_Callback_Postfix(object __instance, MethodBase __originalMethod)
         {
             List<string> events;
             Plugin.Log.LogMessage(__originalMethod.FullDescription());
