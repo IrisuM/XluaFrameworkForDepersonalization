@@ -20,6 +20,10 @@ namespace XLuaFramework.LuaTool
         static Dictionary<string, Object> ResPool = new Dictionary<string, Object>();
         public static Object GetPoolObject(string path)
         {
+            if(path== null)
+            {
+                return null;
+            }
             Object result = null;
             result = ResPool.TryGetValue(path, out result) ? result : null;
             return result;
