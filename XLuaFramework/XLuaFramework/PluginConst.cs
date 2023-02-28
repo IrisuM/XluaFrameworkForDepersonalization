@@ -14,11 +14,11 @@ namespace XLuaFramework
             public const string PLUGIN_NAME = "XluaFramework";
             public const string PLUGIN_VERSION = "1.0.0";
             public const string WELCOME_WORLD = "\n\n\n" +
-                "欢迎关注 安堂いなり(安堂稻荷) https://space.bilibili.com/392505232" +
+                "欢迎关注 扇宝 https://space.bilibili.com/698438232" +
                 "\n" +
-                "是擅长各类恐怖游戏的可爱机械狐狐" +
+                "大貔貅，大貔貅" +
                 "\n" +
-                "《人格解体》直播视频：https://www.bilibili.com/video/BV1SD4y177ne" +
+                "我有一个大貔貅" +
                 "\n\n\n";
             public const string CONFIG_SECTION = "Xlua执行框架";
             public const string CONFIG_IS_MERGE_LUAENV = "是否合并执行环境";
