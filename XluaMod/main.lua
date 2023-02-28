@@ -5,7 +5,6 @@ require "SDK/SDK"
 OnResManagerInstall = function(resManager)
     --加载一个模板，在这个模板上替换文件
     rolemodel = CS.UnityEngine.Object.Instantiate(CS.UnityEngine.Resources.Load("Charator/Prefabs/Model_Custom_000"))
-    rolemodel:SetActive(false) --隐藏物体，避免地图上莫名其妙多个模型
     rolemodel.name = "Model_Custom_huaji" --设置名称，非必要，但是防止冲突
     --创建动画配置，直接按照这个配置修改
     local animation = {
@@ -181,24 +180,6 @@ end
 --注册lua事件回调
 XluaTool:RegCallback("OnResManagerInstall", "创建滑稽mod测试", OnResManagerInstall)
 
---[[
-OnShowActionTip = function(entity)
-    if (Mengluu:StringStartWith(CS.BattleHelper.MapHero.Model.name, "Model_Custom_huaji") == false) then
-        return
-    end
-    Mengluu:Print(entity.name..""..entity:ToString())
-    if (entity.Model ~= nil) then
-        local animation = RoleModelTool:GetAnimation(CS.BattleHelper.MapHero.Model)
-        RoleModelTool:SetAnimation(entity.Model, animation)
-        entity.gameObject:SetActive(false)
-        entity.gameObject:SetActive(true)
-    end
-end
-
---注册显示交互提示事件
-XluaTool:RegEvent(CS.MOD_Entity_BaseUnit, "ShowActionTip", "变成滑稽", true)
-XluaTool:RegCallback("变成滑稽", "创建滑稽mod测试", OnShowActionTip)
---]]
 On_MOD_Entity_Npc_Update = function(entity)
     if
         (CS.UnityEngine.Vector3.Distance(entity.transform.position, CS.BattleHelper.MapHero.transform.position) < 0.35 and
