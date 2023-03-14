@@ -78,10 +78,11 @@ function RoleModelTool:SetHeadIcons(role_model, new_headicons)
         data.Type = value.Type or 0
         role_model.HeadIcons:Add(data)
     end
-    return result
 end
 
 --加载适用于人物动画的图片格式，通常为48*64，如果图片大小不符合，可以自己调用ResourcesTool接口大家在指定大小
 function RoleModelTool:LoadSpriteForRoleModel(path)
-    return ResourcesTool:LoadSprite(path, CS.UnityEngine.Rect(0, 0, 48.0, 64.0), { x = 0.5, y = 0 }, 64)
+    local texture2D=ResourcesTool:LoadTexture2D(path)
+    local rect=CS.UnityEngine.Rect(0, 0, texture2D.width, texture2D.height)
+    return ResourcesTool:CreateSprite(texture2D,rect, { x = 0.5, y = 0 }, texture2D.width)
 end

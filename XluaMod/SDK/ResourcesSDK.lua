@@ -5,10 +5,15 @@ function ResourcesTool:LoadTexture2D(path)
     return CS.UnityEngine.Resources.Load(path, typeof(CS.UnityEngine.Texture2D))
 end
 
+--根据texture2d创建sprite
+function ResourcesTool:CreateSprite(texture2D, rect, pivot, pixelsPerUnit)
+    return CS.UnityEngine.Sprite.Create(texture2D, rect, pivot, pixelsPerUnit)
+end
+
 --从指定路径加载图片为Sprite
 function ResourcesTool:LoadSprite(path, rect, pivot, pixelsPerUnit)
     local texture2D=ResourcesTool:LoadTexture2D(path)
-    return CS.UnityEngine.Sprite.Create(texture2D, rect, pivot, pixelsPerUnit)
+    return ResourcesTool:CreateSprite(texture2D, rect, pivot, pixelsPerUnit)
 end
 
 --从指定路径加载图片为Sprite，并自动设置参数
