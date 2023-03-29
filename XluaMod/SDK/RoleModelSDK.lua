@@ -1,3 +1,4 @@
+--用于修改人物动画模型的SDK工具包
 require "SDK/XluaSDK"
 RoleModelTool = RoleModelTool or {}
 

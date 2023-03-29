@@ -1,3 +1,4 @@
+--一些XLUA插件函数调用工具包
 XluaTool = XluaTool or {}
 
 --创建List，例如 XluaTool:CreateList(CS.System.String) 即可创建List<String>

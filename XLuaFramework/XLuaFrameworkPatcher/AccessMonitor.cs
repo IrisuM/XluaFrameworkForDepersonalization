@@ -18,7 +18,6 @@ namespace XLuaFrameworkPatcher
     {
         private readonly AssemblyDefinition _assembly;
         private readonly TypeDefinition targetType;
-        private readonly Action<string> _callback;
 
         public static MethodDefinition GetMethodDefinitionFromMethodInfo(MethodInfo methodInfo, AssemblyDefinition assemblyDefinition)
         {
@@ -40,20 +39,20 @@ namespace XLuaFrameworkPatcher
 
             return null;
         }
-        public AccessMonitor(AssemblyDefinition assembly,string classDefinition, Action<string> callback)
+        public AccessMonitor(AssemblyDefinition assembly,string classDefinition)
         {
             _assembly = assembly;
             targetType = _assembly.MainModule.GetType(classDefinition);
-            _callback = callback;
         }
 
         public void Monitor()
         {
             if (targetType == null)
             {
-                _callback("未找到目标类型");
+                Console.WriteLine("未找到目标类型");
                 return;
             }
+            Console.WriteLine("开始监控:" + targetType.FullName);
 
             MethodReference monitorMethod = _assembly.MainModule.ImportReference(typeof(AccessMonitor).GetMethod("PrintInfo"));
 

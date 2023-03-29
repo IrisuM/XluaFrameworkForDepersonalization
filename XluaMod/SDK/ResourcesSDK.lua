@@ -1,3 +1,5 @@
+--自建资源管理，等游戏自己做完资源加载后切换到游戏实现方式
+require "SDK/MengluuSDK"
 ResourcesTool = ResourcesTool or {}
 
 --从指定路径加载图片为Texture2D
@@ -31,4 +33,40 @@ end
 --从缓存中取出obj
 function ResourcesTool:GetPoolObject(path)
     return CS.XLuaFramework.LuaTool.ResourcesTool.GetPoolObject(path)
+end
+
+function ResourcesTool:LoadAudioClipFromPath(path,filePath)
+    local url = filePath
+    local UnityWebRequest = CS.UnityEngine.Networking.UnityWebRequest
+    local UnityWebRequestMultimedia = CS.UnityEngine.Networking.UnityWebRequestMultimedia
+    local DownloadHandlerAudioClip = CS.UnityEngine.Networking.DownloadHandlerAudioClip
+    local Application = CS.UnityEngine.Application
+    local RuntimePlatform = CS.UnityEngine.RuntimePlatform
+
+    if Application.platform == RuntimePlatform.WindowsEditor or Application.platform == RuntimePlatform.WindowsPlayer then
+        url = "file:///" .. filePath
+    else
+        url = "file://" .. filePath
+    end
+
+    local www = UnityWebRequestMultimedia.GetAudioClip(url, CS.UnityEngine.AudioType.WAV)
+    coroutine.www(www)
+
+    if www.result == UnityWebRequest.Result.ConnectionError then
+        Mengluu:Print("Error loading AudioClip: " .. www.error)
+        www:Dispose()
+        return nil
+    else
+        local audioClip = DownloadHandlerAudioClip.GetContent(www)
+        www:Dispose()
+        ResourcesTool:AddPoolObject(path,audioClip)
+        return audioClip
+    end
+end
+
+function ResourcesTool:LoadAudioClipCoroutine(path,filePath, callback)
+    coroutine.start(function()
+        local audioClip = ResourcesTool:LoadAudioClipFromPath(path,filePath)
+        callback(audioClip)
+    end)
 end

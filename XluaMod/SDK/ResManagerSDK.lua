@@ -1,3 +1,4 @@
+--用于获取游戏数据的SDK工具包
 ResManagerTool = ResManagerTool or {}
 
 function ResManagerTool:GetAchievement(resManager)
