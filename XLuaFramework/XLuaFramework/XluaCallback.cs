@@ -67,6 +67,7 @@ namespace XLuaFramework
             Plugin.Log.LogMessage(string.Format("注册事件:{0} {1} {2}", methodInfo.FullDescription(), event_name, is_before));
             if (is_before)
             {
+                Plugin.Log.LogInfo(Plugin.harmony==null);
                 Plugin.harmony.Patch(methodInfo, prefix: new HarmonyMethod(typeof(XluaCallback).GetMethod("Xlua_Callback_Prefix")));
             }
             else

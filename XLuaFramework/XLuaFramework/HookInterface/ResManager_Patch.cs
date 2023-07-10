@@ -12,15 +12,15 @@ using BepInEx.Logging;
 
 namespace XLuaFramework.HookInterface
 {
-    internal class ResManager_Patch
+    internal class WorkshopHelper_EndLoadConfigData_Patch
     {
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(ResManager), "Install")]
-        static void ResManager_Install_Postfix(ResManager __instance, Task __result)
+        [HarmonyPatch(typeof(WorkshopHelper), "EndLoadConfigData")]
+        static void WorkshopHelper_EndLoadConfigData_Postfix()
         {
             try
             {
-                XluaCallback.RunCallback(PluginConst.PluginXluaCallbackConfig.OnResManagerInstall, new object[] { __instance });
+                XluaCallback.RunCallback(PluginConst.PluginXluaCallbackConfig.OnResManagerInstall, new object[] {  ResManager.Instance });
             }
             catch (Exception e)
             {
@@ -35,8 +35,8 @@ namespace XLuaFramework.HookInterface
 
         //这里用来加载Xlua管理组件
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(ResManager), "Install")]
-        static void ResManager_Install_Prefix()
+        [HarmonyPatch(typeof(WorkshopHelper), "EndLoadConfigData")]
+        static void WorkshopHelper_EndLoadConfigData_Prefix()
         {
             XluaModComponent.CreateXluaModComponent();
         }

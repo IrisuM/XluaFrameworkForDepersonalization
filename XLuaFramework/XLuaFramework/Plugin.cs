@@ -35,9 +35,11 @@ namespace XLuaFramework
             is_merge_luaenv_config = Config.Bind(PluginConfig.CONFIG_SECTION, PluginConfig.CONFIG_IS_MERGE_LUAENV, false, new ConfigDescription(PluginConfig.CONFIG_IS_MERGE_LUAENV_DESCRIPTION));
             is_enable_console_config = Config.Bind(PluginConfig.CONFIG_SECTION, PluginConfig.CONFIG_IS_ENABLE_CONSOLE, false, new ConfigDescription(PluginConfig.CONFIG_IS_ENABLE_CONSOLE_DESCRIPTION));
 
+            //XluaModComponent.CreateXluaModComponent();
+
             harmony = new Harmony(PluginConfig.PLUGIN_GUID);
             harmony.PatchAll(typeof(HookInterface.UnityEngine_Resources_Patch));
-            harmony.PatchAll(typeof(HookInterface.ResManager_Patch));
+            harmony.PatchAll(typeof(HookInterface.WorkshopHelper_EndLoadConfigData_Patch));
         }
     }
 }
